@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fatura #022026 | Itadent</title>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap 5 (Apenas para grid e utilitários básicos) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter (UI Premium) & JetBrains Mono (Códigos) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- JsBarcode -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-page: #f4f6f8;
+            --bg-card: #ffffff;
+            --bg-subtle: #f8fafc;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-tertiary: #94a3b8;
+            --border-color: #e2e8f0;
+            --accent: #4f46e5; /* Indigo Premium */
+            --accent-hover: #4338ca;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Typography */
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .text-secondary { color: var(--text-secondary) !important; }
+        
+        /* Premium Card */
+        .premium-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.04), 0 2px 6px -2px rgba(0, 0, 0, 0.02);
+            overflow: hidden;
+        }
+
+        /* Header & Amount */
+        .invoice-header {
+            padding: 32px 32px 0;
+        }
+        .invoice-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 100px;
+        }
+        .status-dot {
+            width: 6px; height: 6px;
+            background: var(--warning);
+            border-radius: 50%;
+        }
+
+        /* Due Date Badge */
+        .due-date-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .due-date-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+        .due-date-value svg {
+            color: var(--warning);
+        }
+
+        /* Items List */
+        .items-list {
+            padding: 24px 32px;
+        }
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .item-row:last-child { border-bottom: none; }
+        .item-title { font-weight: 500; color: var(--text-primary); }
+        .item-desc { font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px; }
+        .item-price { font-weight: 600; color: var(--text-primary); }
+
+        /* Tabs */
+        .payment-tabs {
+            display: flex;
+            background: var(--bg-subtle);
+            margin: 0 32px;
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid var(--border-color);
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .tab-btn.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            font-weight: 600;
+        }
+
+        /* Tab Content */
+        .tab-content-area {
+            padding: 24px 32px 32px;
+        }
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Barcode Container */
+        .barcode-wrapper {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Copyable Input/Pill */
+        .copy-pill {
+            display: flex;
+            align-items: center;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 4px 4px 4px 16px;
+            transition: border-color 0.2s;
+        }
+        .copy-pill:hover { border-color: #cbd5e1; }
+        .copy-pill-text {
+            flex: 1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            word-break: break-all;
+            padding: 8px 0;
+        }
+        .copy-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .copy-btn:hover {
+            background: var(--text-primary);
+            color: white;
+            border-color: var(--text-primary);
+        }
+        .copy-btn.copied {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        /* Footer */
+        .premium-footer {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-tertiary);
+            font-size: 0.8rem;
+        }
+        .premium-footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .premium-footer a:hover { color: var(--accent); }
+
+        /* Responsive */
+        @media (max-width: 576px) {
+            .invoice-header, .items-list, .payment-tabs, .tab-content-area {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            .invoice-amount { font-size: 2rem; }
+            .payment-tabs { margin: 0 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Minimalist Header -->
+    <nav class="py-4">
+        <div class="container text-center">
+            <span class="fw-bold fs-5" style="letter-spacing: -0.02em; color: var(--text-primary);">
+                itadent<span style="color: var(--accent);">.</span>
+            </span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container pb-5" style="max-width: 660px;">
+        <div class="premium-card">
+            
+            <!-- Invoice Header -->
+            <div class="invoice-header">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <p class="text-secondary mb-1 small fw-medium">Fatura #012026</p>
+                        <div class="status-pill">
+                            <span class="status-dot"></span>
+                            Pagamento efetuado com sucesso
+                        </div>
+                    </div>
+                    <!-- DATA DE VENCIMENTO ADICIONADA AQUI -->
+                    <div class="text-end">
+                        <p class="due-date-label">Vencimento</p>
+                        <p class="due-date-value">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/></svg>
+                            20/07/2026
+                        </p>
+                    </div>
+                </div>
+                <p class="text-secondary small mb-2">Total a pagar</p>
+                <h1 class="invoice-amount">R$ 411,59</h1>
+            </div>
+
+            <!-- Items List -->
+            <div class="items-list">
+                <div class="item-row">
+                    <div>
+                        <div class="item-title">Domínio</div>
+                        <div class="item-desc">itadent.com.br • Anual (Exp: 24/09/2026)</div>
+                    </div>
+                    <div class="item-price">Pago</div>
+                </div>
+                <div class="item-row">
+                    <div>
+                        <div class="item-title">Hospedagem</div>
+                        <div class="item-desc">Plano Semestral • Jan a Jun 2026</div>
+                    </div>
+                    <div class="item-price">R$ 411,59</div>
+                </div>
+            </div>
+
+            <!-- Payment Tabs -->
+            <div class="payment-tabs">
+                <button class="tab-btn active" onclick="switchTab('boleto', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1 mb-1" viewBox="0 0 16 16"><path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/><path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3z"/></svg>
+                    Boleto
+                </button>
+                <button class="tab-btn" onclick="switchTab('crypto', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1 mb-1" viewBox="0 0 16 16"><path d="M5.5 9.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5zm0-2a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5z"/><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM1 8a7 7 0 1 1 14 0A7 7 0 0 1 1 8z"/></svg>
+                    Cripto
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tab-content-area">
+                
+                <!-- Boleto Pane -->
+                <div id="boleto" class="tab-pane active">
+                    <div class="barcode-wrapper">
+                        <svg id="barcode" class="w-100"></svg>
+                    </div>
+                    
+                    <label class="text-secondary small fw-medium d-block mb-2">Linha digitável</label>
+                    <div class="copy-pill">
+                        <span class="copy-pill-text" id="boleto-line">42297.11504 00064.897317 09742.465025 6 15130000041159</span>
+                        <button class="copy-btn" onclick="copyText('boleto-line', this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+                            Copiar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Crypto Pane -->
+                <div id="crypto" class="tab-pane">
+                    <p class="text-secondary small mb-3">
+                        Envie o valor exato para a rede Ethereum (ERC-20) ou Polygon (PoS).
+                    </p>
+                    
+                    <label class="text-secondary small fw-medium d-block mb-2">Endereço da carteira</label>
+                    <div class="copy-pill">
+                        <span class="copy-pill-text" id="crypto-address">0xc7f7b6E424866924C3A2F0d4d4eFbfF5f1b01931</span>
+                        <button class="copy-btn" onclick="copyText('crypto-address', this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+                            Copiar
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="premium-footer">
+            <p class="mb-2">Dúvidas? Entre em contato conosco.</p>
+            <p class="mb-0">
+               <i class="fa-brands fa-telegram"></i> <a href="https://t.me/jsdevop">Telegram</a> &nbsp;•&nbsp; 
+                <i class="fa-solid fa-envelope ms-2 me-1"></i> <a href="mailto:jsdevops@outlook.de">JSDEVOPS</a>
+            </p>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // 1. Generate Barcode
+        document.addEventListener("DOMContentLoaded", function() {
+            const rawLine = "42297115040006489731709742465025615130000041159";
+            try {
+                JsBarcode("#barcode", rawLine, {
+                    format: "CODE128",
+                    width: 1.5,
+                    height: 50,
+                    displayValue: false,
+                    background: "transparent",
+                    lineColor: "#0f172a",
+                    margin: 0
+                });
+            } catch (e) {
+                console.error("Erro ao gerar código de barras:", e);
+            }
+        });
+
+        // 2. Tab Switching
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            
+            btn.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // 3. Copy to Clipboard
+        function copyText(elementId, btn) {
+            const text = document.getElementById(elementId).innerText.replace(/\s/g, '');
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/></svg> Copiado';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
